@@ -12,6 +12,16 @@ const usernamePattern = /^[a-zA-Z0-9_]{3,20}$/;
 const roomChannels = new Map();
 let membershipChannel;
 
+function waitForChannel(channel) {
+  return new Promise((resolve, reject) => channel.subscribe((status, error) => {
+    if (status === 'SUBSCRIBED') return resolve();
+    if (['CHANNEL_ERROR', 'TIMED_OUT', 'CLOSED'].includes(status)) {
+      const detail = error?.message || error?.reason || error?.code || '';
+      reject(new Error(`Realtime ${status.toLowerCase()}${detail ? `: ${detail}` : '. Check the Supabase Realtime service and channel policies.'}`));
+    }
+  }));
+}
+
 function profile(row) {
   return { id: row.id, username: row.username, pub: row.public_key || null };
 }
@@ -180,6 +190,7 @@ export async function mutateMessage(type, { cid, id, body, on }) {
 export async function subscribeConversation(conversation, handlers) {
   const id = conversation.id;
   if (roomChannels.has(id)) return;
+  await supabase.realtime.setAuth();
   const channel = supabase.channel(`conv:${id}`, { config: { private: true, presence: { key: (await supabase.auth.getUser()).data.user.id } } });
   channel.on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `conversation_id=eq.${id}` }, async payload => {
     const row = payload.new?.id ? payload.new : payload.old;
@@ -191,25 +202,32 @@ export async function subscribeConversation(conversation, handlers) {
   channel.on('broadcast', { event: 'read' }, ({ payload }) => handlers.read(payload));
   channel.on('presence', { event: 'sync' }, () => handlers.presence(channel.presenceState()));
   roomChannels.set(id, channel);
-  await new Promise((resolve, reject) => channel.subscribe(status => {
-    if (status === 'SUBSCRIBED') resolve();
-    if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') reject(new Error('Realtime connection failed.'));
-  }));
-  await channel.track({ user_id: (await supabase.auth.getUser()).data.user.id, username: handlers.username });
+  try {
+    await waitForChannel(channel);
+    await channel.track({ user_id: (await supabase.auth.getUser()).data.user.id, username: handlers.username });
+  } catch (error) {
+    roomChannels.delete(id);
+    await supabase.removeChannel(channel).catch(() => {});
+    throw error;
+  }
 }
 
 export async function subscribeMemberships(onConversation) {
   if (membershipChannel) return;
   const user = (await supabase.auth.getUser()).data.user;
+  await supabase.realtime.setAuth();
   const channel = supabase.channel(`user:${user.id}`, { config: { private: true } });
   channel.on('postgres_changes', {
     event: 'INSERT', schema: 'public', table: 'conversation_members', filter: `user_id=eq.${user.id}`
   }, payload => onConversation(payload.new.conversation_id));
   membershipChannel = channel;
-  await new Promise((resolve, reject) => channel.subscribe(status => {
-    if (status === 'SUBSCRIBED') resolve();
-    if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') reject(new Error('Realtime connection failed.'));
-  }));
+  try {
+    await waitForChannel(channel);
+  } catch (error) {
+    membershipChannel = null;
+    await supabase.removeChannel(channel).catch(() => {});
+    throw error;
+  }
 }
 
 export async function broadcast(conversationId, event, payload) {
