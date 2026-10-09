@@ -125,10 +125,10 @@ export async function listConversations() {
   return hydrated.sort((a, b) => new Date(b.last?.createdAt || b.createdAt) - new Date(a.last?.createdAt || a.createdAt));
 }
 
-export async function searchUsers(query) {
-  const user = (await supabase.auth.getUser()).data.user;
+export async function searchUsers(query, currentUserId) {
+  if (!currentUserId) throw new Error('Your sign-in session is missing. Please sign in again.');
   const rows = await one(supabase.from('profiles').select('id,username,public_key')
-    .neq('id', user.id).ilike('username', `%${query}%`).order('username').limit(20));
+    .neq('id', currentUserId).ilike('username', `%${query}%`).order('username').limit(20));
   return rows.map(row => ({ ...profile(row), online: false }));
 }
 

@@ -217,7 +217,7 @@ async function loadConversations() {
 async function runSearch() {
   const query = $('#find').value.trim(), box = $('#results');
   if (!query) { box.classList.add('hidden'); $('#list').classList.remove('hidden'); return; }
-  const [users, messages] = await Promise.all([db.searchUsers(query), db.searchMessages(query, convs)]);
+  const [users, messages] = await Promise.all([db.searchUsers(query, me?.id), db.searchMessages(query, convs)]);
   box.replaceChildren(); $('#list').classList.add('hidden'); box.classList.remove('hidden');
   if (users.length) box.append(el('div', 'muted', 'People'));
   for (const user of users) {
@@ -458,7 +458,7 @@ $('#g-find').oninput = () => {
     const query = $('#g-find').value.trim(), box = $('#g-results'); box.replaceChildren();
     if (!query) return;
     try {
-      for (const user of await db.searchUsers(query)) {
+      for (const user of await db.searchUsers(query, me?.id)) {
         if (selected.has(user.id)) continue;
         const button = el('button', 'chip', user.username); button.type = 'button';
         button.onclick = () => { selected.set(user.id, user); renderSelected(); button.remove(); };
