@@ -1,0 +1,1385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e1f1b">
+<title>Ridge – chat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --night: #0b1a16; --night-2: #12281f; --night-3: #1a3a30; --snow: #f4f6f2; --paper: #ffffff;
+  --ink: #16241f; --muted: #66786f; --line: #dbe3dd; --glacier: #1e7a6e; --glacier-d: #17625a;
+  --ember: #ec8a3c; --alert: #b3372c; --online: #5fd3a8; --on-night: #e7f0eb; --on-night-muted: #86a196;
+  --chat-bg: var(--snow); --bubble-in: #ffffff; --contour: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' fill='none' stroke='%230e1f1b' stroke-opacity='.07'%3E%3Cpath d='M-10 20c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 46c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 72c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 98c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 124c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 150c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 176c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 202c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 228c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 254c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 280c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 306c60-40 120 30 175-10s105-30 155 10'/%3E%3C/svg%3E");
+  --display: "Fraunces", Georgia, serif; --font: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --snow: #0f1d19; --paper: #15251f; --ink: #e6efeb; --muted: #8aa095; --line: #25372f; --chat-bg: #0d1a16; --bubble-in: #1a2c25; --glacier: #2a998a; --contour: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' fill='none' stroke='%23ffffff' stroke-opacity='.07'%3E%3Cpath d='M-10 20c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 46c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 72c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 98c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 124c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 150c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 176c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 202c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 228c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 254c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 280c60-40 120 30 175-10s105-30 155 10'/%3E%3Cpath d='M-10 306c60-40 120 30 175-10s105-30 155 10'/%3E%3C/svg%3E"); }
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { font: 15px/1.5 var(--font); background: var(--snow); color: var(--ink); -webkit-font-smoothing: antialiased; }
+.hidden { display: none !important; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
+::selection { background: var(--ember); color: #1a0f05; }
+
+input, textarea { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; transition: border-color .15s, box-shadow .15s; }
+input:focus, textarea:focus { outline: none; border-color: var(--glacier); box-shadow: 0 0 0 3px color-mix(in srgb, var(--glacier) 22%, transparent); }
+label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin: 14px 0 0; }
+label input { margin-top: 5px; color: var(--ink); font-size: 15px; }
+.primary { background: var(--glacier); color: #fff; border: 0; border-radius: 10px; padding: 10px 18px; font-weight: 600; transition: background .15s, transform .1s; }
+.primary:hover { background: var(--glacier-d); }
+.primary:active { transform: translateY(1px); }
+.ghost { background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 7px 12px; white-space: nowrap; transition: background .15s; }
+.ghost:hover { background: color-mix(in srgb, var(--glacier) 10%, transparent); }
+.muted { color: var(--muted); font-size: 12.5px; }
+.err { color: var(--alert); min-height: 1.4em; margin: 10px 0 0; font-size: 13px; }
+.mark { width: 48px; color: var(--glacier); display: block; }
+.mark.small { width: 30px; color: var(--ember); flex: none; }
+
+/* ---------- Auth ---------- */
+.auth { min-height: 100%; display: grid; grid-template-columns: 1.1fr 1fr; }
+.hero { position: relative; overflow: hidden; background: linear-gradient(180deg, #060f0d 0%, #0d2a24 70%, #12382f 100%); color: var(--on-night); display: flex; align-items: flex-start; padding: 44px; min-height: 100dvh; }
+.stars { position: absolute; inset: 0; background-image: radial-gradient(1.2px 1.2px at 12% 18%, #fff 50%, transparent), radial-gradient(1px 1px at 28% 8%, #fff 50%, transparent), radial-gradient(1.4px 1.4px at 46% 22%, #fff 50%, transparent), radial-gradient(1px 1px at 63% 12%, #fff 50%, transparent), radial-gradient(1.2px 1.2px at 78% 26%, #fff 50%, transparent), radial-gradient(1px 1px at 90% 9%, #fff 50%, transparent), radial-gradient(1px 1px at 8% 38%, #fff 50%, transparent), radial-gradient(1.3px 1.3px at 55% 40%, #fff 50%, transparent); opacity: .55; }
+.range { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 62%; }
+.hero-copy { position: relative; max-width: 22ch; }
+.wordmark { font: 600 44px/1 var(--display); letter-spacing: -0.02em; }
+.hero-copy p { margin: 14px 0 0; font-size: 19px; line-height: 1.35; color: #b8cdc3; }
+.auth-form { display: grid; place-items: center; padding: 28px; background: var(--snow); }
+.auth-card { width: min(380px, 100%); }
+.auth h1 { margin: 0; font: 600 32px/1.1 var(--display); letter-spacing: -0.02em; }
+.sub { margin: 8px 0 22px; color: var(--muted); }
+.tabs { display: flex; gap: 4px; background: color-mix(in srgb, var(--ink) 7%, transparent); padding: 4px; border-radius: 12px; }
+.tabs button { flex: 1; border: 0; background: transparent; padding: 8px; border-radius: 9px; font-weight: 500; color: var(--muted); }
+.tabs button.on { background: var(--paper); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.auth .primary { width: 100%; margin-top: 6px; padding: 12px; }
+
+/* ---------- App shell ---------- */
+.app { height: 100dvh; display: grid; grid-template-columns: 340px 1fr; }
+.side { background: var(--night); color: var(--on-night); display: flex; flex-direction: column; min-height: 0; }
+.side-head { display: flex; align-items: center; gap: 10px; padding: 16px 16px 10px; }
+.me { flex: 1; min-width: 0; line-height: 1.25; }
+.me strong { font-size: 15px; }
+.conn { display: block; font-size: 12px; color: var(--on-night-muted); }
+.conn::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ember); margin-right: 6px; }
+.conn.on::before { background: var(--online); }
+.side .ghost { color: var(--on-night); border-color: #264238; font-size: 13px; }
+.side .ghost:hover { background: var(--night-3); }
+.side-tools { display: flex; gap: 8px; padding: 6px 16px 14px; }
+.side input { background: var(--night-2); border-color: #213a31; color: var(--on-night); }
+.side input::placeholder { color: var(--on-night-muted); }
+.list, .results { list-style: none; margin: 0; padding: 0 8px 8px; overflow-y: auto; flex: 1; scrollbar-width: thin; scrollbar-color: #264238 transparent; }
+.row-item { position: relative; display: flex; gap: 12px; padding: 10px 10px; align-items: center; cursor: pointer; border-radius: 12px; transition: background .12s; }
+.row-item:hover { background: var(--night-2); }
+.row-item.on { background: var(--night-3); }
+.row-item.on::before { content: ""; position: absolute; left: -8px; top: 10px; bottom: 10px; width: 3px; border-radius: 0 3px 3px 0; background: var(--ember); }
+.avatar { width: 42px; height: 42px; border-radius: 50%; background: #2f5a4f; color: #fff; display: grid; place-items: center; font-weight: 700; flex: none; position: relative; }
+.avatar.group { border-radius: 13px; }
+.dot { position: absolute; right: -1px; bottom: -1px; width: 12px; height: 12px; border-radius: 50%; background: var(--online); border: 2.5px solid var(--night); }
+.meta { min-width: 0; flex: 1; }
+.meta .top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.meta .name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.side .muted { color: var(--on-night-muted); font-size: 12px; }
+.meta .snippet { color: var(--on-night-muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.badge { background: var(--ember); color: #2a1503; border-radius: 99px; font-size: 11.5px; padding: 1px 8px; font-weight: 700; align-self: center; }
+
+/* ---------- Chat ---------- */
+.chat { display: flex; flex-direction: column; min-height: 0; min-width: 0; background: var(--chat-bg); }
+.empty { margin: auto; text-align: center; color: var(--muted); padding: 24px; background: var(--contour); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.empty .mark { width: 72px; opacity: .8; }
+.empty h2 { font: 600 26px/1.2 var(--display); color: var(--ink); margin: 14px 0 4px; letter-spacing: -0.01em; }
+.empty p { margin: 0; }
+.pane { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.chat-head { display: flex; align-items: center; gap: 10px; padding: 13px 20px; background: var(--paper); border-bottom: 1px solid var(--line); }
+.chat-head strong { font: 600 18px/1.2 var(--display); letter-spacing: -0.01em; }
+.back { display: none; font-size: 22px; padding: 0 12px; line-height: 1.5; }
+.msgs { flex: 1; overflow-y: auto; padding: 18px 20px; display: flex; flex-direction: column; gap: 3px; background: var(--contour); }
+.day { align-self: center; color: var(--muted); font-size: 12px; font-weight: 500; background: var(--chat-bg); padding: 3px 12px; border-radius: 99px; border: 1px solid var(--line); margin: 12px 0 6px; }
+.msg { max-width: min(560px, 80%); padding: 8px 13px; border-radius: 18px 18px 18px 5px; background: var(--bubble-in); border: 1px solid var(--line); align-self: flex-start; word-wrap: anywhere; white-space: pre-wrap; box-shadow: 0 1px 1px rgba(10,30,25,.04); }
+.msg.mine { align-self: flex-end; border-radius: 18px 18px 5px 18px; background: var(--glacier); color: #fff; border-color: transparent; }
+.msg .who { font-size: 12px; font-weight: 700; display: block; margin-bottom: 1px; }
+.msg.mine .who { display: none; }
+.msg .t { font-size: 11px; opacity: .6; margin-left: 10px; white-space: nowrap; float: right; margin-top: 5px; }
+.msg.deleted { font-style: italic; opacity: .6; }
+.msg img { max-width: 100%; max-height: 320px; border-radius: 12px; display: block; margin: 2px 0 4px; }
+.msg audio, .msg video { max-width: 100%; display: block; }
+.msg a { color: inherit; font-weight: 600; }
+.tools { display: none; gap: 10px; font-size: 11.5px; margin-top: 4px; clear: both; }
+.msg:hover .tools, .msg:focus-within .tools { display: flex; }
+.tools button { background: none; border: 0; padding: 0; color: inherit; text-decoration: underline; opacity: .85; }
+.seen { align-self: flex-end; font-size: 11.5px; color: var(--muted); margin: 2px 4px 0; }
+.typing { height: 22px; padding: 0 22px; font-size: 12.5px; color: var(--muted); background: var(--chat-bg); }
+.typing:not(:empty)::before { content: "• • •"; letter-spacing: 2px; color: var(--ember); margin-right: 8px; animation: blink 1.2s infinite; }
+@keyframes blink { 50% { opacity: .35; } }
+.composer { display: flex; gap: 6px; padding: 10px 14px calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--chat-bg); align-items: flex-end; }
+.composer textarea { resize: none; max-height: 120px; border-radius: 22px; padding: 11px 16px; }
+.icon { width: 42px; height: 42px; flex: none; display: grid; place-items: center; border-radius: 50%; border: 0; background: transparent; color: var(--muted); transition: background .15s, color .15s; }
+.icon:hover { background: color-mix(in srgb, var(--glacier) 14%, transparent); color: var(--glacier); }
+.icon.rec { background: var(--alert); color: #fff; animation: pulse 1.3s infinite; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--alert) 25%, transparent); } }
+.send { width: 42px; height: 42px; flex: none; display: grid; place-items: center; border-radius: 50%; border: 0; background: var(--ember); color: #2a1503; transition: transform .1s, filter .15s; }
+.send:hover { filter: brightness(1.07); }
+.send:active { transform: scale(.94); }
+
+/* ---------- AI assist ---------- */
+.grow { flex: 1; min-width: 0; }
+.spark { border-color: var(--ember); color: var(--ink); }
+.spark::before { content: "✦ "; color: var(--ember); }
+.assist { background: var(--chat-bg); padding: 0 14px; }
+.assist-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 2px 0 6px; }
+.assist-row:empty { display: none; }
+.assist .chip { cursor: pointer; font: inherit; font-size: 13px; color: var(--ink); background: var(--paper); border-color: var(--line); transition: border-color .12s, background .12s; }
+.assist .chip:hover { border-color: var(--ember); }
+.assist .chip.smart::before { content: "✦ "; color: var(--ember); }
+.assist .chip:disabled { opacity: .5; cursor: progress; }
+.sum-body { white-space: pre-wrap; line-height: 1.55; margin: 12px 0; max-height: 50vh; overflow-y: auto; }
+
+/* ---------- Pins, polls, encryption ---------- */
+.pinbar { display: flex; align-items: center; gap: 10px; padding: 7px 20px; background: color-mix(in srgb, var(--ember) 13%, var(--paper)); border-bottom: 1px solid var(--line); cursor: pointer; font-size: 13.5px; }
+.pinbar .pin-n { color: var(--ember); font-weight: 700; flex: none; }
+.pinbar .pin-t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msg.flash { animation: flash 1.2s ease-out; }
+@keyframes flash { 0%, 40% { box-shadow: 0 0 0 3px var(--ember); } }
+.msg .pinned-tag { font-size: 11px; font-weight: 700; color: var(--ember); display: block; }
+.msg.mine .pinned-tag { color: #ffd9b3; }
+.msg .transcript { display: block; font-size: 13px; font-style: italic; opacity: .85; margin-top: 4px; white-space: pre-wrap; }
+.poll { min-width: min(300px, 70vw); }
+.poll-q { font-weight: 700; margin-bottom: 8px; }
+.poll .opt { position: relative; display: flex; justify-content: space-between; gap: 10px; width: 100%; text-align: left; padding: 8px 12px; margin-top: 5px; border-radius: 10px; border: 1px solid var(--line); background: transparent; overflow: hidden; color: inherit; }
+.poll .opt .bar { position: absolute; inset: 0 auto 0 0; background: color-mix(in srgb, var(--ember) 30%, transparent); transition: width .25s; }
+.poll .opt .lbl, .poll .opt .cnt { position: relative; }
+.poll .opt.voted { border-color: var(--ember); font-weight: 600; }
+.poll .poll-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; opacity: .8; }
+.poll .poll-foot button { background: none; border: 0; padding: 0; color: inherit; text-decoration: underline; font-weight: 600; }
+.lock { color: var(--ember); }
+.lockbtn { background: none; border: 0; color: var(--on-night-muted); font-size: 14px; padding: 4px 6px; border-radius: 8px; }
+.lockbtn:hover { background: var(--night-3); color: var(--on-night); }
+label.check { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; }
+label.check input { width: auto; margin: 3px 0 0; }
+.p-opts { display: grid; gap: 6px; margin: 10px 0; }
+
+/* ---------- Dialog ---------- */
+dialog { border: 1px solid var(--line); border-radius: 18px; background: var(--paper); color: var(--ink); width: min(430px, 92vw); padding: 24px; }
+dialog::backdrop { background: rgba(5,15,12,.55); backdrop-filter: blur(2px); }
+dialog h2 { margin: 0; font: 600 24px/1.2 var(--display); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip { border: 1px solid var(--line); background: var(--snow); border-radius: 99px; padding: 4px 12px; font-size: 13px; }
+.picked .chip { background: var(--glacier); color: #fff; border-color: transparent; }
+.row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+/* ---------- Mobile ---------- */
+@media (max-width: 760px) {
+  .auth { grid-template-columns: 1fr; grid-template-rows: 210px 1fr; }
+  .hero { min-height: 0; padding: 26px; }
+  .wordmark { font-size: 34px; }
+  .hero-copy p { font-size: 15px; }
+  .range { height: 75%; }
+  .app { grid-template-columns: 1fr; }
+  .chat { display: none; }
+  .app.in-chat .side { display: none; }
+  .app.in-chat .chat { display: flex; }
+  .back { display: block; }
+  .msg { max-width: 88%; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .msg { animation: pop .14s ease-out; } @keyframes pop { from { opacity: 0; transform: translateY(4px); } }
+  .hero-copy { animation: rise .7s ease-out both; } @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+</style>
+</head>
+<body>
+
+<main id="auth" class="auth hidden">
+  <section class="hero" aria-hidden="true">
+    <div class="stars"></div>
+    <svg class="range" viewBox="0 0 600 300" preserveAspectRatio="xMidYMax slice">
+      <path d="M0 300V190l70-60 55 40 90-110 80 95 60-45 110 120 60-50 75 70v150Z" fill="#1b4a42" opacity=".55"/>
+      <path d="M0 300V230l90-70 70 55 110-105 90 100 70-60 170 150Z" fill="#14362f" opacity=".85"/>
+      <path d="M0 300V265l120-60 80 45 120-80 120 95 80-40 80 75Z" fill="#0b1f1a"/>
+      <path d="M270 145l-22 28 22-8 20 10Z M215 80l-15 19 15-6 14 7Z" fill="#e9f1ec" opacity=".9"/>
+    </svg>
+    <div class="hero-copy">
+      <span class="wordmark">Ridge</span>
+      <p>Conversations, built from the ground up.</p>
+    </div>
+  </section>
+  <section class="auth-form">
+    <div class="auth-card">
+      <h1>Welcome back</h1>
+      <p class="sub" id="a-sub">Sign in to pick up where you left off.</p>
+      <div class="tabs" role="tablist">
+        <button id="tab-login" class="on" type="button">Sign in</button>
+        <button id="tab-register" type="button">Create account</button>
+      </div>
+      <label>Username <input id="a-user" autocomplete="username" maxlength="20" autocapitalize="none"></label>
+      <label>Password <input id="a-pass" type="password" autocomplete="current-password"></label>
+      <p id="a-err" class="err" role="alert"></p>
+      <button id="a-go" class="primary" type="button">Sign in</button>
+    </div>
+  </section>
+</main>
+
+<div id="app" class="app hidden">
+  <aside id="side" class="side">
+    <header class="side-head">
+      <svg class="mark small" viewBox="0 0 48 28" aria-hidden="true"><path d="M1 27 15 6l8 11 7-9 17 19Z" fill="currentColor"/></svg>
+      <div class="me"><strong id="me-name"></strong><span id="conn" class="conn">connecting…</span></div>
+      <button id="logout" class="ghost" type="button">Sign out</button>
+    </header>
+    <div class="side-tools">
+      <input id="find" placeholder="Find people or messages" autocomplete="off">
+      <button id="new-group" class="ghost" type="button">New group</button>
+    </div>
+    <div id="results" class="results hidden"></div>
+    <ul id="list" class="list"></ul>
+  </aside>
+
+  <section id="chat" class="chat">
+    <div id="empty" class="empty">
+      <svg class="mark" viewBox="0 0 48 28" aria-hidden="true"><path d="M1 27 15 6l8 11 7-9 17 19Z" fill="currentColor"/></svg>
+      <h2>Pick a trail</h2>
+      <p>Search for someone on the left to start a conversation.</p>
+    </div>
+    <div id="pane" class="pane hidden">
+      <header class="chat-head">
+        <button id="back" class="ghost back" type="button" aria-label="Back to chats">‹</button>
+        <div class="grow"><strong id="c-title"></strong><div id="c-sub" class="muted"></div></div>
+        <button id="verify" class="ghost hidden" type="button">Verify</button>
+        <button id="summarize" class="ghost spark" type="button">Catch me up</button>
+      </header>
+      <div id="pinbar" class="pinbar hidden"></div>
+      <div id="msgs" class="msgs"></div>
+      <div id="typing" class="typing"></div>
+      <div id="assist" class="assist">
+        <div id="chips" class="assist-row"></div>
+        <div id="rewrite" class="assist-row hidden">
+          <span class="muted">Rewrite:</span>
+          <button type="button" class="chip" data-style="fix">Fix grammar</button>
+          <button type="button" class="chip" data-style="shorter">Shorter</button>
+          <button type="button" class="chip" data-style="friendlier">Friendlier</button>
+          <button type="button" class="chip" data-style="formal">Formal</button>
+        </div>
+      </div>
+      <footer class="composer">
+        <input type="file" id="file" class="hidden" accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.txt,.mp3,.wav,.ogg,.webm,.m4a,.mp4">
+        <button id="attach" class="icon" type="button" title="Attach file" aria-label="Attach file">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 11-9 9a5.5 5.5 0 0 1-8-8l9-9a3.7 3.7 0 0 1 5.3 5.3l-9 9a1.8 1.8 0 0 1-2.6-2.6l8-8"/></svg>
+        </button>
+        <button id="rec" class="icon" type="button" title="Record voice note" aria-label="Record voice note">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+        </button>
+        <button id="poll-btn" class="icon" type="button" title="Create poll or event" aria-label="Create poll or event">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
+        </button>
+        <textarea id="text" rows="1" placeholder="Write a message" maxlength="4000"></textarea>
+        <button id="send" class="send" type="button" title="Send" aria-label="Send">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </footer>
+    </div>
+  </section>
+</div>
+
+<dialog id="sum-dlg">
+  <h2>Catch me up</h2>
+  <p id="sum-body" class="sum-body"></p>
+  <p class="muted">Written by AI from this chat's recent messages. It can make mistakes.</p>
+  <div class="row"><button id="sum-close" class="ghost" type="button">Close</button></div>
+</dialog>
+
+<dialog id="poll-dlg">
+  <h2>New poll</h2>
+  <label>Question <input id="p-q" maxlength="200" placeholder="When should we meet?"></label>
+  <label class="check"><input id="p-event" type="checkbox"> Event poll: options are dates &amp; times</label>
+  <div id="p-opts" class="p-opts"></div>
+  <button id="p-add" class="ghost" type="button">Add option</button>
+  <p id="p-err" class="err"></p>
+  <div class="row"><button id="p-cancel" class="ghost" type="button">Cancel</button><button id="p-create" class="primary" type="button">Post poll</button></div>
+</dialog>
+
+<dialog id="group-dlg">
+  <form method="dialog" id="group-form">
+    <h2>New group</h2>
+    <label>Group name <input id="g-name" maxlength="40"></label>
+    <label class="check"><input id="g-enc" type="checkbox"> End-to-end encrypted (AI, polls and files are off in encrypted chats)</label>
+    <label>Add members <input id="g-find" placeholder="Search usernames" autocomplete="off"></label>
+    <div id="g-results" class="chips"></div>
+    <div id="g-picked" class="chips picked"></div>
+    <p id="g-err" class="err"></p>
+    <div class="row"><button value="cancel" class="ghost">Cancel</button><button id="g-create" class="primary" type="button">Create group</button></div>
+  </form>
+</dialog>
+
+<script>
+/* Ridge in-browser backend: replaces server.js (Express + SQLite + WebSocket) with localStorage + BroadcastChannel.
+   Open the page in two tabs to chat between two accounts. AI features need a server, so they are off here. */
+(function () {
+  const K = 'ridge_db', ON = 'ridge_online', ch = new BroadcastChannel('ridge');
+  const load = () => { try { return JSON.parse(localStorage.getItem(K)) || null; } catch { return null; } };
+  const save = d => localStorage.setItem(K, JSON.stringify(d));
+  let db = load();
+  if (!db) { db = { users: [{ id: 1, username: 'Assistant', pass: '!', created: Date.now() }], convs: [], msgs: [], seq: { u: 1, c: 0, m: 0 } }; save(db); }
+  const tx = fn => { db = load() || db; const r = fn(db); save(db); return r; };
+  const socks = new Set(), AI = 1;
+  const me = () => Number(sessionStorage.getItem('ridge_uid')) || 0;
+  const uname = id => db.users.find(u => u.id === id)?.username;
+  const conv = id => db.convs.find(c => c.id === id);
+  const mem = (c, uid) => c.members.find(m => m.uid === uid);
+  const isMember = (cid, uid) => { const c = conv(cid); return !!(c && mem(c, uid)); };
+  const mids = cid => conv(cid).members.map(m => m.uid);
+  const onlineIds = () => { let o = {}; try { o = JSON.parse(localStorage.getItem(ON)) || {}; } catch {} return Object.keys(o).filter(k => o[k] > Date.now() - 15000).map(Number); };
+  const beat = () => { let o = {}; try { o = JSON.parse(localStorage.getItem(ON)) || {}; } catch {} for (const s of socks) o[s.uid] = Date.now(); localStorage.setItem(ON, JSON.stringify(o)); };
+  const unbeat = uid => { let o = {}; try { o = JSON.parse(localStorage.getItem(ON)) || {}; } catch {} delete o[uid]; localStorage.setItem(ON, JSON.stringify(o)); };
+  setInterval(beat, 5000);
+
+  function deliver(ids, obj) {
+    const data = JSON.stringify(obj);
+    for (const s of socks) if (!ids || ids.includes(s.uid)) setTimeout(() => s.onmessage && s.onmessage({ data }), 0);
+  }
+  const sendTo = (ids, obj) => { deliver(ids, obj); ch.postMessage({ ids, obj }); };
+  ch.onmessage = e => { db = load() || db; deliver(e.data.ids, e.data.obj); };
+
+  const pollJson = m => ({ event: !!m.poll.event, options: m.poll.options.map((o, i) => ({ text: o.text, ts: o.ts || null, votes: Object.keys(m.votes || {}).filter(u => m.votes[u] === i).map(Number) })) });
+  const msgJson = m => ({
+    id: m.id, cid: m.cid, senderId: m.senderId, senderName: uname(m.senderId), body: m.deleted ? '' : m.body, kind: m.kind,
+    deleted: !!m.deleted, pinned: !!m.pinned, file: m.fileUrl && !m.deleted ? { url: m.fileUrl, name: m.fileName, mime: m.fileMime } : null,
+    transcript: m.deleted ? null : m.transcript || null, poll: m.kind === 'poll' && !m.deleted && m.poll ? pollJson(m) : null,
+    createdAt: m.createdAt, editedAt: m.editedAt || null
+  });
+  const getMsg = id => msgJson(db.msgs.find(m => m.id === id));
+  function convJson(cid, uid) {
+    const c = conv(cid), mine = mem(c, uid), msgs = db.msgs.filter(m => m.cid === cid), last = msgs[msgs.length - 1];
+    return {
+      id: c.id, type: c.type, name: c.name, encrypted: !!c.enc, wrappedKey: mine?.wrapped || null,
+      members: c.members.map(m => { const u = db.users.find(x => x.id === m.uid); return { id: u.id, username: u.username, pub: u.pub || null, lastRead: m.lastRead }; }),
+      last: last ? msgJson(last) : null,
+      unread: msgs.filter(m => m.id > (mine ? mine.lastRead : 0) && m.senderId !== uid && !m.deleted).length, createdAt: c.createdAt
+    };
+  }
+  const addMsg = (cid, senderId, extra) => tx(d => { const m = { id: ++d.seq.m, cid, senderId, body: '', kind: 'text', createdAt: Date.now(), ...extra }; d.msgs.push(m); return m.id; });
+  const validKeys = (keys, ids, by) => { const o = {}; for (const id of ids) { const k = keys?.[id]; if (!k || Number(k.by) !== by || typeof k.iv !== 'string' || typeof k.ct !== 'string') return null; o[id] = { by, iv: k.iv, ct: k.ct }; } return o; };
+  const err = (status, error) => ({ status, j: { error } });
+  const ok = j => ({ status: 200, j });
+  const TYPES = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', pdf: 'application/pdf', txt: 'text/plain', mp3: 'audio/mpeg', wav: 'audio/wav', ogg: 'audio/ogg', webm: 'audio/webm', m4a: 'audio/mp4', mp4: 'video/mp4' };
+  const MAX_FILE = 1.5 * 1024 * 1024;
+
+  function aiReply(cid) {
+    const ids = mids(cid);
+    sendTo(ids, { type: 'typing', cid, userId: AI, username: 'Assistant', on: true });
+    setTimeout(() => {
+      sendTo(ids, { type: 'typing', cid, userId: AI, username: 'Assistant', on: false });
+      const id = addMsg(cid, AI, { body: 'The AI assistant needs a server with an API key, so it is not available in this standalone HTML version.' });
+      sendTo(ids, { type: 'message', message: getMsg(id) });
+    }, 600);
+  }
+
+  async function route(method, path, query, body, raw) {
+    db = load() || db;
+    const uid = me();
+    if (path === '/register') {
+      const { username = '', password = '', publicKey, keyBackup } = body || {};
+      if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) return err(400, 'Username must be 3–20 letters, numbers or underscores.');
+      if (username.toLowerCase() === 'assistant') return err(400, 'That username is reserved.');
+      if (!/^[a-f0-9]{64}$/.test(password)) return err(400, 'Invalid credentials format.');
+      if (!publicKey || !keyBackup) return err(400, 'Missing encryption keys.');
+      if (db.users.some(u => u.username.toLowerCase() === username.toLowerCase())) return err(409, 'That username is taken.');
+      const id = tx(d => { const id = ++d.seq.u; d.users.push({ id, username, pass: password, pub: publicKey, backup: keyBackup, created: Date.now() }); return id; });
+      sessionStorage.setItem('ridge_uid', id); return ok({ id, username });
+    }
+    if (path === '/login') {
+      const u = db.users.find(x => x.username.toLowerCase() === String(body?.username || '').toLowerCase());
+      if (!u || u.pass !== body.password) return err(401, 'Wrong username or password.');
+      sessionStorage.setItem('ridge_uid', u.id); return ok({ id: u.id, username: u.username });
+    }
+    if (path === '/logout') { sessionStorage.removeItem('ridge_uid'); return ok({ ok: true }); }
+    if (!uid || !db.users.some(u => u.id === uid)) return err(401, 'Please sign in.');
+    const u = db.users.find(x => x.id === uid);
+    if (path === '/me') return ok({ id: u.id, username: u.username, aiId: AI, aiEnabled: false, publicKey: u.pub || null, keyBackup: u.backup || null });
+    if (path === '/keys') {
+      if (u.pub || !body?.publicKey || !body?.keyBackup) return err(400, 'Keys cannot be set.');
+      tx(() => { u.pub = body.publicKey; u.backup = body.keyBackup; }); return ok({ ok: true });
+    }
+    if (path === '/users') {
+      const q = String(query.q || '').toLowerCase(), on = onlineIds();
+      return ok(db.users.filter(x => x.id !== uid && x.username.toLowerCase().includes(q)).slice(0, 20).map(x => ({ id: x.id, username: x.username, pub: x.pub || null, online: on.includes(x.id) })));
+    }
+    if (path === '/conversations' && method === 'GET') {
+      const list = db.convs.filter(c => mem(c, uid)).map(c => convJson(c.id, uid));
+      const stamp = c => c.last ? c.last.createdAt : c.createdAt;
+      return ok({ conversations: list.sort((a, b) => stamp(b) - stamp(a)), online: onlineIds() });
+    }
+    if (path === '/conversations/dm') {
+      const other = Number(body?.userId);
+      if (!other || other === uid || !db.users.some(x => x.id === other)) return err(400, 'Pick another user.');
+      const enc = !!body?.encrypted, key = [uid, other].sort((a, b) => a - b).join(':') + (enc ? ':e' : '');
+      let c = db.convs.find(x => x.dmKey === key);
+      if (!c) {
+        let w = {};
+        if (enc) {
+          if (!u.pub || !db.users.find(x => x.id === other).pub) return err(400, 'Both people need an encryption key. The AI assistant cannot join secret chats.');
+          w = validKeys(body.keys, [uid, other], uid); if (!w) return err(400, 'Missing encryption keys.');
+        }
+        const id = tx(d => { const id = ++d.seq.c; d.convs.push({ id, type: 'dm', name: null, dmKey: key, enc, createdBy: uid, createdAt: Date.now(), members: [uid, other].map(x => ({ uid: x, lastRead: 0, wrapped: w[x] || null })) }); return id; });
+        for (const x of [uid, other]) sendTo([x], { type: 'conversation', conversation: convJson(id, x) });
+        c = conv(id);
+      }
+      return ok(convJson(c.id, uid));
+    }
+    if (path === '/conversations/group') {
+      const name = String(body?.name || '').trim().slice(0, 40), enc = !!body?.encrypted;
+      const ids = [...new Set([uid, ...(body?.memberIds || []).map(Number)])].filter(id => db.users.some(x => x.id === id));
+      if (!name) return err(400, 'Give the group a name.');
+      if (ids.length < 2) return err(400, 'Add at least one other member.');
+      let w = {};
+      if (enc) {
+        if (!ids.every(id => db.users.find(x => x.id === id).pub)) return err(400, 'Everyone in an encrypted group needs an encryption key. The AI assistant cannot join.');
+        w = validKeys(body.keys, ids, uid); if (!w) return err(400, 'Missing encryption keys.');
+      }
+      const id = tx(d => { const id = ++d.seq.c; d.convs.push({ id, type: 'group', name, enc, createdBy: uid, createdAt: Date.now(), members: ids.map(x => ({ uid: x, lastRead: 0, wrapped: w[x] || null })) }); return id; });
+      for (const x of ids) sendTo([x], { type: 'conversation', conversation: convJson(id, x) });
+      return ok(convJson(id, uid));
+    }
+    let m = path.match(/^\/conversations\/(\d+)\/(messages|pins)$/);
+    if (m) {
+      const cid = Number(m[1]); if (!isMember(cid, uid)) return err(403, 'Not a member.');
+      const rows = db.msgs.filter(x => x.cid === cid);
+      if (m[2] === 'pins') return ok(rows.filter(x => x.pinned && !x.deleted).reverse().slice(0, 20).map(msgJson));
+      const before = Number(query.before) || 9e15;
+      return ok(rows.filter(x => x.id < before).slice(-50).map(msgJson));
+    }
+    if (path === '/search') {
+      const q = String(query.q || '').trim().toLowerCase(); if (q.length < 2) return ok([]);
+      return ok(db.msgs.filter(x => !x.deleted && ['text', 'poll'].includes(x.kind) && !conv(x.cid).enc && isMember(x.cid, uid) && x.body.toLowerCase().includes(q)).reverse().slice(0, 30).map(msgJson));
+    }
+    if (path === '/polls') {
+      const cid = Number(body?.cid); if (!isMember(cid, uid)) return err(403, 'Not a member.');
+      if (conv(cid).enc) return err(400, 'Polls are not available in end-to-end encrypted chats.');
+      const q = String(body?.question || '').trim().slice(0, 200), event = !!body?.event;
+      const options = (Array.isArray(body?.options) ? body.options : []).slice(0, 6).map(o => ({ text: String(o?.text || '').trim().slice(0, 80), ts: event && o?.ts && !isNaN(Date.parse(o.ts)) ? new Date(o.ts).toISOString() : null })).filter(o => o.text && (!event || o.ts));
+      if (!q) return err(400, 'Add a question.');
+      if (options.length < 2) return err(400, 'Add at least two options.');
+      const id = addMsg(cid, uid, { kind: 'poll', body: q, poll: { event, options }, votes: {} });
+      sendTo(mids(cid), { type: 'message', message: getMsg(id) }); return ok(getMsg(id));
+    }
+    if (path === '/upload') {
+      const cid = Number(query.cid); if (!isMember(cid, uid)) return err(403, 'Not a member.');
+      if (conv(cid).enc) return err(400, 'Attachments are disabled in end-to-end encrypted chats.');
+      const name = String(query.name || 'file').split(/[\\/]/).pop().slice(0, 100), ext = (name.split('.').pop() || '').toLowerCase();
+      if (!TYPES[ext]) return err(400, `.${ext} files are not allowed.`);
+      if (!raw || !raw.size) return err(400, 'The file is empty.');
+      if (raw.size > MAX_FILE) return err(400, 'Files are limited to 1.5 MB in the standalone version.');
+      const url = await new Promise(r => { const f = new FileReader(); f.onload = () => r(f.result); f.readAsDataURL(new Blob([raw], { type: TYPES[ext] })); });
+      const tr = TYPES[ext].startsWith('audio/') ? String(query.transcript || '').trim().slice(0, 2000) || null : null;
+      let id; try { id = addMsg(cid, uid, { kind: 'file', fileName: name, fileUrl: url, fileMime: TYPES[ext], transcript: tr }); }
+      catch { return err(400, 'Browser storage is full. Delete some files and try again.'); }
+      sendTo(mids(cid), { type: 'message', message: getMsg(id) }); return ok(getMsg(id));
+    }
+    if (path.startsWith('/ai/')) return err(503, 'AI needs a server with an API key and is not available in the standalone HTML version.');
+    return err(404, 'Not found.');
+  }
+
+  const realFetch = window.fetch.bind(window);
+  window.fetch = async (url, opt = {}) => {
+    const s = String(url);
+    if (!s.startsWith('/api')) return realFetch(url, opt);
+    const [p, qs = ''] = s.slice(4).split('?'), query = Object.fromEntries(new URLSearchParams(qs));
+    const isBlob = opt.body instanceof Blob;
+    let body = null; if (opt.body && !isBlob) { try { body = JSON.parse(opt.body); } catch {} }
+    const { status, j } = await route((opt.method || 'GET').toUpperCase(), p, query, body, isBlob ? opt.body : null);
+    return new Response(JSON.stringify(j), { status, headers: { 'Content-Type': 'application/json' } });
+  };
+
+  function wsHandle(ws, d) {
+    const uid = ws.uid; db = load() || db;
+    const cid = Number(d.cid); if (!cid || !isMember(cid, uid)) return;
+    const c = conv(cid), others = mids(cid).filter(x => x !== uid), enc = !!c.enc;
+    const clean = raw => { const b = String(raw || '').trim(); return enc ? (/^e1:[A-Za-z0-9+/=]+:[A-Za-z0-9+/=]+$/.test(b) && b.length <= 24000 ? b : '') : b.slice(0, 4000); };
+    const upd = id => sendTo(mids(cid), { type: 'update', message: getMsg(id) });
+    if (d.type === 'send') {
+      const body = clean(d.body); if (!body) return;
+      const id = addMsg(cid, uid, { body });
+      tx(x => { mem(conv(cid), uid).lastRead = id; });
+      sendTo([uid, ...others], { type: 'message', message: getMsg(id), tempId: d.tempId, from: uid });
+      if (!enc && (/(^|\s)@ai\b/i.test(body) || (c.type === 'dm' && mids(cid).includes(AI)))) aiReply(cid);
+    } else if (d.type === 'typing') sendTo(others, { type: 'typing', cid, userId: uid, username: uname(uid), on: !!d.on });
+    else if (d.type === 'read') {
+      const id = Number(d.messageId) || 0;
+      tx(() => { const mm = mem(conv(cid), uid); mm.lastRead = Math.max(mm.lastRead, id); });
+      sendTo(mids(cid), { type: 'read', cid, userId: uid, messageId: id });
+    } else if (d.type === 'edit') {
+      const body = clean(d.body), id = Number(d.id);
+      const existing = db.msgs.find(x => x.id === id);
+      if (body && existing && existing.senderId === uid && existing.cid === cid && existing.kind === 'text' && !existing.deleted) {
+        // tx() reloads the database, so look up the message again inside the transaction.
+        const updated = tx(dbase => {
+          const m = dbase.msgs.find(x => x.id === id);
+          if (!m || m.senderId !== uid || m.cid !== cid || m.kind !== 'text' || m.deleted) return false;
+          m.body = body;
+          m.editedAt = Date.now();
+          return true;
+        });
+        if (updated) upd(id);
+      }
+    } else if (d.type === 'delete') {
+      const id = Number(d.id);
+      // tx() reloads localStorage, so find and modify the message inside the transaction.
+      const deleted = tx(dbase => {
+        const m = dbase.msgs.find(x => x.id === id);
+        if (!m || m.senderId !== uid || m.cid !== cid || m.deleted) return false;
+        m.deleted = 1;
+        m.body = '';
+        m.pinned = 0;
+        // Remove attached content from the deleted message as well.
+        m.fileUrl = null;
+        m.fileName = null;
+        m.fileMime = null;
+        m.transcript = null;
+        return true;
+      });
+      if (deleted) upd(id);
+    } else if (d.type === 'pin') {
+      const id = Number(d.id);
+      // Always update the freshly loaded database object, not a stale reference.
+      const changed = tx(dbase => {
+        const m = dbase.msgs.find(x => x.id === id);
+        if (!m || m.cid !== cid || m.deleted) return false;
+        m.pinned = d.on ? 1 : 0;
+        return true;
+      });
+      if (changed) upd(id);
+    } else if (d.type === 'vote') {
+      const id = Number(d.id), opt = Number(d.option);
+      const before = db.msgs.find(x => x.id === id);
+      if (!before || before.cid !== cid || before.kind !== 'poll' || before.deleted || !Number.isInteger(opt) || opt < 0 || opt >= before.poll.options.length) return;
+      // Find the poll again inside tx: tx reloads the database, so an older object reference is stale.
+      tx(dbase => {
+        const poll = dbase.msgs.find(x => x.id === id);
+        if (!poll || poll.cid !== cid || poll.kind !== 'poll' || poll.deleted) return;
+        poll.votes = poll.votes || {};
+        if (poll.votes[uid] === opt) delete poll.votes[uid];
+        else poll.votes[uid] = opt;
+      });
+      upd(id);
+    }
+  }
+
+  window.WebSocket = class {
+    constructor() {
+      this.readyState = 0; this.uid = me();
+      setTimeout(() => {
+        if (!this.uid) { this.readyState = 3; this.onclose && this.onclose(); return; }
+        const first = ![...socks].some(s => s.uid === this.uid);
+        socks.add(this); this.readyState = 1; beat();
+        this.onopen && this.onopen();
+        deliver([this.uid], { type: 'hello', online: onlineIds() });
+        if (first) sendTo(null, { type: 'presence', userId: this.uid, online: true });
+      }, 50);
+    }
+    send(raw) { try { wsHandle(this, JSON.parse(raw)); } catch (e) { console.error(e); } }
+    close() {
+      if (this.readyState === 3) return; this.readyState = 3; socks.delete(this);
+      if (![...socks].some(s => s.uid === this.uid)) { unbeat(this.uid); sendTo(null, { type: 'presence', userId: this.uid, online: false }); }
+      this.onclose && this.onclose();
+    }
+  };
+  addEventListener('beforeunload', () => { for (const s of [...socks]) { unbeat(s.uid); ch.postMessage({ ids: null, obj: { type: 'presence', userId: s.uid, online: false } }); } });
+})();
+
+</script>
+<script>
+'use strict';
+/*
+ * Ridge end-to-end encryption helpers (Web Crypto, no dependencies).
+ *
+ *  - Auth secret:   PBKDF2(password, "ridge-auth:<username>") -> sent to the server instead of the password.
+ *  - Identity:      ECDH P-256 key pair per user. The private key is stored on the server only as an
+ *                   AES-GCM blob encrypted with a key derived from the password (random salt), so a
+ *                   new device can restore it after login. The server cannot decrypt it.
+ *  - Conversation:  one random AES-256-GCM key per encrypted chat. The creator wraps it for every member
+ *                   using ECDH(creatorPrivate, memberPublic) -> AES-GCM. Messages are AES-GCM encrypted.
+ */
+(function (root) {
+  const wc = root.crypto || require('node:crypto').webcrypto;
+  const subtle = wc.subtle;
+  const rnd = n => wc.getRandomValues(new Uint8Array(n));
+  const enc = new TextEncoder(), dec = new TextDecoder();
+  const EC = { name: 'ECDH', namedCurve: 'P-256' };
+
+  const b64 = u8 => {
+    let s = '';
+    for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+    return btoa(s);
+  };
+  const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  const hex = u8 => [...u8].map(b => b.toString(16).padStart(2, '0')).join('');
+
+  async function pbkdf2(password, salt, bits) {
+    const base = await subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+    return new Uint8Array(await subtle.deriveBits({
+      name: 'PBKDF2', hash: 'SHA-256', iterations: 210000,
+      salt: typeof salt === 'string' ? enc.encode(salt) : salt
+    }, base, bits));
+  }
+
+  const authSecret = async (username, password) => hex(await pbkdf2(password, 'ridge-auth:' + username.toLowerCase(), 256));
+
+  const backupKey = async (password, salt) =>
+    subtle.importKey('raw', await pbkdf2(password, salt, 256), 'AES-GCM', false, ['encrypt', 'decrypt']);
+
+  const importPriv = jwk => subtle.importKey('jwk', jwk, EC, false, ['deriveKey']);
+  const importPub = s => subtle.importKey('jwk', JSON.parse(s), EC, false, []);
+
+  async function createIdentity(password) {
+    const kp = await subtle.generateKey(EC, true, ['deriveKey']);
+    const publicKey = JSON.stringify(await subtle.exportKey('jwk', kp.publicKey));
+    const privJwk = await subtle.exportKey('jwk', kp.privateKey);
+    const salt = rnd(16), iv = rnd(12);
+    const ct = new Uint8Array(await subtle.encrypt({ name: 'AES-GCM', iv }, await backupKey(password, salt), enc.encode(JSON.stringify(privJwk))));
+    return { publicKey, keyBackup: { salt: b64(salt), iv: b64(iv), ct: b64(ct) }, privateKey: await importPriv(privJwk) };
+  }
+
+  async function unlockIdentity(password, backup) {
+    const pt = await subtle.decrypt({ name: 'AES-GCM', iv: unb64(backup.iv) }, await backupKey(password, unb64(backup.salt)), unb64(backup.ct));
+    return importPriv(JSON.parse(dec.decode(pt)));
+  }
+
+  const sharedKey = async (priv, pubStr) =>
+    subtle.deriveKey({ name: 'ECDH', public: await importPub(pubStr) }, priv, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+
+  const newConvKey = () => subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
+
+  async function wrapConvKey(convKey, priv, theirPub, myId) {
+    const iv = rnd(12);
+    const ct = new Uint8Array(await subtle.encrypt({ name: 'AES-GCM', iv }, await sharedKey(priv, theirPub), await subtle.exportKey('raw', convKey)));
+    return { by: myId, iv: b64(iv), ct: b64(ct) };
+  }
+
+  async function unwrapConvKey(w, priv, byPub) {
+    const raw = await subtle.decrypt({ name: 'AES-GCM', iv: unb64(w.iv) }, await sharedKey(priv, byPub), unb64(w.ct));
+    return subtle.importKey('raw', raw, 'AES-GCM', false, ['encrypt', 'decrypt']);
+  }
+
+  async function encryptText(key, text) {
+    const iv = rnd(12);
+    const ct = new Uint8Array(await subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(text)));
+    return 'e1:' + b64(iv) + ':' + b64(ct);
+  }
+
+  async function decryptText(key, s) {
+    const [, iv, ct] = s.split(':');
+    return dec.decode(await subtle.decrypt({ name: 'AES-GCM', iv: unb64(iv) }, key, unb64(ct)));
+  }
+
+  // Short code both people can compare out-of-band to detect a swapped key.
+  async function fingerprint(pubA, pubB) {
+    const [a, b] = [pubA, pubB].sort();
+    const h = new Uint8Array(await subtle.digest('SHA-256', enc.encode(a + '|' + b)));
+    return hex(h).slice(0, 24).toUpperCase().match(/.{4}/g).join(' ');
+  }
+
+  const api = { authSecret, createIdentity, unlockIdentity, newConvKey, wrapConvKey, unwrapConvKey, encryptText, decryptText, fingerprint };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.E2E = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const hue = str => { let h = 0; for (const ch of str) h = (h * 31 + ch.charCodeAt(0)) % 360; return h; };
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+let me = null, priv = null, ws = null, active = null, wantSocket = false;
+const convs = new Map();      // id -> conversation
+const msgs = new Map();       // id -> messages[] (ascending)
+const pins = new Map();       // id -> pinned messages (newest first)
+const convKeys = new Map();   // id -> Promise<CryptoKey>
+const online = new Set();
+const typingNow = new Map();  // cid -> Map(userId -> {name, timer})
+let pinIdx = 0;
+
+async function api(method, path, body) {
+  const r = await fetch('/api' + path, {
+    method, credentials: 'same-origin',
+    headers: body ? { 'Content-Type': 'application/json' } : {},
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || 'Something went wrong.');
+  return j;
+}
+
+/* ------------------------------ Local key storage ------------------------------ */
+const idb = () => new Promise((res, rej) => {
+  const r = indexedDB.open('ridge', 1);
+  r.onupgradeneeded = () => r.result.createObjectStore('keys');
+  r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+});
+async function idbDo(mode, fn) {
+  const d = await idb();
+  return new Promise((res, rej) => {
+    const t = d.transaction('keys', mode), req = fn(t.objectStore('keys'));
+    t.oncomplete = () => res(req && req.result); t.onerror = () => rej(t.error);
+  });
+}
+const saveKey = (id, k) => idbDo('readwrite', s => s.put(k, 'priv:' + id));
+const loadKey = id => idbDo('readonly', s => s.get('priv:' + id)).catch(() => null);
+const dropKey = id => idbDo('readwrite', s => s.delete('priv:' + id)).catch(() => {});
+
+/* ------------------------------ Auth ------------------------------ */
+let mode = 'login';
+function setMode(m) {
+  mode = m;
+  $('#tab-login').classList.toggle('on', m === 'login');
+  $('#tab-register').classList.toggle('on', m === 'register');
+  $('#a-go').textContent = m === 'login' ? 'Sign in' : 'Create account';
+  $('#auth h1').textContent = m === 'login' ? 'Welcome back' : 'Join Ridge';
+  $('#a-sub').textContent = m === 'login' ? 'Sign in to pick up where you left off.' : 'Pick a username and start talking in seconds.';
+  $('#a-pass').autocomplete = m === 'login' ? 'current-password' : 'new-password';
+  $('#a-err').textContent = '';
+}
+$('#tab-login').onclick = () => setMode('login');
+$('#tab-register').onclick = () => setMode('register');
+
+async function submitAuth() {
+  const btn = $('#a-go'), label = btn.textContent;
+  try {
+    const username = $('#a-user').value.trim(), pw = $('#a-pass').value;
+    if (mode === 'register' && pw.length < 6) throw new Error('Password must be at least 6 characters.');
+    if (!username || !pw) throw new Error('Enter your username and password.');
+    btn.disabled = true; btn.textContent = 'Securing your account…';
+    const secret = await E2E.authSecret(username, pw);   // the server never sees the real password
+    let identity = null;
+    if (mode === 'register') {
+      identity = await E2E.createIdentity(pw);
+      await api('POST', '/register', { username, password: secret, publicKey: identity.publicKey, keyBackup: identity.keyBackup });
+    } else {
+      await api('POST', '/login', { username, password: secret });
+    }
+    me = await api('GET', '/me');
+    if (identity) priv = identity.privateKey;
+    else if (me.keyBackup) priv = await E2E.unlockIdentity(pw, me.keyBackup);
+    else {                                   // account without keys: create and upload once
+      identity = await E2E.createIdentity(pw);
+      await api('POST', '/keys', { publicKey: identity.publicKey, keyBackup: identity.keyBackup });
+      me.publicKey = identity.publicKey; priv = identity.privateKey;
+    }
+    await saveKey(me.id, priv);
+    $('#a-pass').value = '';
+    if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+    await startApp();
+  } catch (e) { $('#a-err').textContent = e.message; }
+  btn.disabled = false; btn.textContent = label;
+}
+$('#a-go').onclick = submitAuth;
+$('#a-pass').onkeydown = e => { if (e.key === 'Enter') submitAuth(); };
+$('#a-user').onkeydown = e => { if (e.key === 'Enter') $('#a-pass').focus(); };
+
+$('#logout').onclick = async () => {
+  wantSocket = false;
+  if (ws) ws.close();
+  if (me) await dropKey(me.id);
+  await api('POST', '/logout').catch(() => {});
+  me = null; priv = null; active = null;
+  convs.clear(); msgs.clear(); pins.clear(); convKeys.clear(); online.clear();
+  showAuth();
+};
+function showAuth(note) { $('#app').classList.add('hidden'); $('#auth').classList.remove('hidden'); $('#a-err').textContent = note || ''; }
+
+async function startApp() {
+  $('#auth').classList.add('hidden');
+  $('#app').classList.remove('hidden', 'in-chat');
+  $('#me-name').textContent = me.username;
+  $('#pane').classList.add('hidden'); $('#empty').classList.remove('hidden');
+  await loadConversations();
+  wantSocket = true;
+  connect();
+}
+
+/* ------------------------------ Encryption helpers ------------------------------ */
+function convKey(c) {
+  if (!convKeys.has(c.id)) {
+    const by = c.members.find(m => m.id === (c.wrappedKey && c.wrappedKey.by));
+    convKeys.set(c.id, c.wrappedKey && by ? E2E.unwrapConvKey(c.wrappedKey, priv, by.pub) : Promise.reject(new Error('No key')));
+    convKeys.get(c.id).catch(() => convKeys.delete(c.id));
+  }
+  return convKeys.get(c.id);
+}
+async function decryptMsg(m) {
+  const c = convs.get(m.cid);
+  if (!c || !c.encrypted || m.deleted || m.kind !== 'text' || m._dec) return m;
+  try { m.body = await E2E.decryptText(await convKey(c), m.body); }
+  catch { m.body = '🔒 This message could not be decrypted on this device.'; }
+  m._dec = true;
+  return m;
+}
+const decryptAll = async list => { await Promise.all(list.map(decryptMsg)); return list; };
+
+/* ------------------------------ Data ------------------------------ */
+async function loadConversations() {
+  const { conversations, online: on } = await api('GET', '/conversations');
+  convs.clear();
+  for (const c of conversations) convs.set(c.id, c);
+  await Promise.all(conversations.map(c => c.last && decryptMsg(c.last)));
+  online.clear(); on.forEach(id => online.add(id));
+  renderList();
+}
+
+const other = c => c.members.find(m => m.id !== me.id) || c.members[0];
+const title = c => c.type === 'group' ? c.name : other(c).username;
+const fmtTime = t => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const nameOf = (c, id) => (c.members.find(m => m.id === id) || {}).username || 'Someone';
+const snippet = m => {
+  if (!m) return 'No messages yet';
+  const who = m.senderId === me.id ? 'You: ' : '';
+  if (m.deleted) return 'Message deleted';
+  if (m.poll) return who + 'Poll: ' + m.body;
+  if (m.file) return who + (m.file.mime.startsWith('audio/') ? 'Voice note' : 'Sent ' + m.file.name);
+  return who + m.body;
+};
+
+/* ------------------------------ Sidebar ------------------------------ */
+function avatar(c) {
+  const a = el('div', 'avatar' + (c.type === 'group' ? ' group' : ''), title(c)[0].toUpperCase());
+  a.style.background = `hsl(${hue(title(c))} 38% 36%)`;
+  if (c.type === 'dm' && online.has(other(c).id)) a.append(el('span', 'dot'));
+  return a;
+}
+function renderList() {
+  const ul = $('#list'); ul.replaceChildren();
+  const stamp = c => c.last ? c.last.createdAt : c.createdAt;
+  const sorted = [...convs.values()].sort((a, b) => stamp(b) - stamp(a));
+  if (!sorted.length) { const li = el('li', 'muted', 'No chats yet. Search for a username above.'); li.style.padding = '14px'; ul.append(li); }
+  for (const c of sorted) {
+    const li = el('li', 'row-item' + (c.id === active ? ' on' : ''));
+    const meta = el('div', 'meta'), top = el('div', 'top');
+    const name = el('span', 'name', (c.encrypted ? '🔒 ' : '') + title(c));
+    top.append(name, el('span', 'muted', c.last ? fmtTime(c.last.createdAt) : ''));
+    meta.append(top, el('div', 'snippet', snippet(c.last)));
+    li.append(avatar(c), meta);
+    if (c.unread) li.append(el('span', 'badge', c.unread > 99 ? '99+' : String(c.unread)));
+    li.onclick = () => openConv(c.id);
+    ul.append(li);
+  }
+}
+
+let findTimer;
+$('#find').oninput = () => { clearTimeout(findTimer); findTimer = setTimeout(runSearch, 200); };
+async function runSearch() {
+  const q = $('#find').value.trim(), box = $('#results');
+  if (!q) { box.classList.add('hidden'); $('#list').classList.remove('hidden'); return; }
+  const [users, found] = await Promise.all([api('GET', '/users?q=' + encodeURIComponent(q)), q.length > 1 ? api('GET', '/search?q=' + encodeURIComponent(q)) : []]);
+  box.replaceChildren();
+  $('#list').classList.add('hidden'); box.classList.remove('hidden');
+  const head = t => { const h = el('div', 'muted', t); h.style.padding = '8px 10px'; return h; };
+  if (users.length) box.append(head('People'));
+  for (const u of users) {
+    const li = el('div', 'row-item');
+    const a = el('div', 'avatar', u.username[0].toUpperCase()); a.style.background = `hsl(${hue(u.username)} 38% 36%)`;
+    if (u.online) a.append(el('span', 'dot'));
+    li.append(a, Object.assign(el('div', 'name', u.username), { style: 'flex:1' }));
+    if (u.pub) {
+      const lock = el('button', 'lockbtn', '🔒 Secret'); lock.type = 'button'; lock.title = 'Start an end-to-end encrypted chat';
+      lock.onclick = e => { e.stopPropagation(); startDm(u, true).catch(err => alert(err.message)); };
+      li.append(lock);
+    }
+    li.onclick = () => startDm(u, false).catch(err => alert(err.message));
+    box.append(li);
+  }
+  if (found.length) box.append(head('Messages'));
+  for (const m of found) {
+    const c = convs.get(m.cid); if (!c) continue;
+    const li = el('div', 'row-item'), meta = el('div', 'meta');
+    meta.append(el('div', 'name', title(c)), el('div', 'snippet', m.senderName + ': ' + m.body));
+    li.append(meta); li.onclick = () => openConv(c.id);
+    box.append(li);
+  }
+  if (!users.length && !found.length) { const d = el('div', 'muted', 'No matches.'); d.style.padding = '14px'; box.append(d); }
+}
+
+async function startDm(u, secret) {
+  const body = { userId: u.id };
+  if (secret) {
+    if (!u.pub || !me.publicKey) throw new Error('This person has no encryption key yet.');
+    const k = await E2E.newConvKey();
+    body.encrypted = true;
+    body.keys = {
+      [me.id]: await E2E.wrapConvKey(k, priv, me.publicKey, me.id),
+      [u.id]: await E2E.wrapConvKey(k, priv, u.pub, me.id)
+    };
+  }
+  const c = await api('POST', '/conversations/dm', body);
+  convs.set(c.id, c);
+  $('#find').value = ''; runSearch(); renderList();
+  await openConv(c.id);
+}
+
+/* ------------------------------ Conversation view ------------------------------ */
+async function openConv(id) {
+  active = id; pinIdx = 0;
+  const c = convs.get(id);
+  $('#app').classList.add('in-chat');
+  $('#empty').classList.add('hidden'); $('#pane').classList.remove('hidden');
+  $('#c-title').textContent = (c.encrypted ? '🔒 ' : '') + title(c);
+  updateSub();
+  for (const id2 of ['#attach', '#rec', '#poll-btn', '#summarize']) $(id2).classList.toggle('hidden', c.encrypted);
+  $('#assist').classList.toggle('hidden', c.encrypted);
+  $('#verify').classList.toggle('hidden', !(c.encrypted && c.type === 'dm'));
+  if (!msgs.has(id)) msgs.set(id, await decryptAll(await api('GET', `/conversations/${id}/messages`)));
+  if (!pins.has(id)) pins.set(id, await decryptAll(await api('GET', `/conversations/${id}/pins`).catch(() => [])));
+  if (active !== id) return;
+  renderMsgs(true); renderTyping(); renderList(); renderPins();
+  markRead(); $('#text').focus({ preventScroll: true });
+  suggestReplies();
+}
+function updateSub() {
+  const c = convs.get(active); if (!c) return;
+  const base = c.type === 'group' ? c.members.map(m => m.username).join(', ') : (online.has(other(c).id) ? 'Online' : 'Offline');
+  $('#c-sub').textContent = (c.encrypted ? 'End-to-end encrypted · ' : '') + base;
+}
+$('#back').onclick = () => { $('#app').classList.remove('in-chat'); active = null; renderList(); };
+
+$('#verify').onclick = async () => {
+  const c = convs.get(active), o = other(c);
+  alert(`Safety code for you and ${o.username}:\n\n${await E2E.fingerprint(me.publicKey, o.pub)}\n\nCompare this with ${o.username} in person or on a call. If it matches, no one is intercepting your encryption keys.`);
+};
+
+function fileNode(m) {
+  const f = m.file, wrap = el('div');
+  if (f.mime.startsWith('image/')) { const i = el('img'); i.src = f.url; i.alt = f.name; i.loading = 'lazy'; wrap.append(i); }
+  else if (f.mime.startsWith('audio/')) {
+    const a = el('audio'); a.controls = true; a.src = f.url; wrap.append(a);
+    if (m.transcript) wrap.append(el('span', 'transcript', 'Transcript: ' + m.transcript));
+  }
+  else if (f.mime.startsWith('video/')) { const v = el('video'); v.controls = true; v.src = f.url; wrap.append(v); }
+  else { const a = el('a', null, f.name); a.href = f.url; a.download = f.name; wrap.append(a); }
+  return wrap;
+}
+
+function downloadIcs(titleText, iso) {
+  const d = new Date(iso), end = new Date(d.getTime() + 3600000);
+  const f = x => x.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Ridge//EN', 'BEGIN:VEVENT', 'UID:' + Date.now() + '@ridge',
+    'DTSTAMP:' + f(new Date()), 'DTSTART:' + f(d), 'DTEND:' + f(end), 'SUMMARY:' + titleText.replace(/[\r\n,;]/g, ' '), 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  const a = el('a'); a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' })); a.download = 'event.ics'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+function pollNode(m, c) {
+  const p = m.poll, box = el('div', 'poll');
+  box.append(el('div', 'poll-q', (p.event ? '📅 ' : '') + m.body));
+  const total = p.options.reduce((n, o) => n + o.votes.length, 0);
+  let best = -1, bestN = 0;
+  p.options.forEach((o, i) => { if (o.votes.length > bestN) { bestN = o.votes.length; best = i; } });
+  p.options.forEach((o, i) => {
+    const b = el('button', 'opt' + (o.votes.includes(me.id) ? ' voted' : '')); b.type = 'button';
+    const bar = el('span', 'bar'); bar.style.width = (total ? o.votes.length / total * 100 : 0) + '%';
+    b.append(bar, el('span', 'lbl', o.text), el('span', 'cnt', String(o.votes.length)));
+    b.title = o.votes.length ? o.votes.map(id => nameOf(c, id)).join(', ') : 'No votes yet';
+    b.onclick = () => send({ type: 'vote', cid: m.cid, id: m.id, option: i });
+    box.append(b);
+  });
+  const foot = el('div', 'poll-foot');
+  foot.append(el('span', null, total + (total === 1 ? ' vote' : ' votes') + ' · tap to vote or undo'));
+  if (p.event && best > -1) {
+    const cal = el('button', null, 'Add leading time to calendar'); cal.type = 'button';
+    cal.onclick = () => downloadIcs(m.body, p.options[best].ts);
+    foot.append(cal);
+  }
+  box.append(foot);
+  return box;
+}
+
+function renderMsgs(forceBottom) {
+  const box = $('#msgs'), c = convs.get(active), list = msgs.get(active) || [];
+  const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+  box.replaceChildren();
+  let lastDay = '', myLast = null;
+  for (const m of list) if (m.senderId === me.id && !m.deleted) myLast = m;
+  for (const m of list) {
+    const day = new Date(m.createdAt).toDateString();
+    if (day !== lastDay) { box.append(el('div', 'day', day === new Date().toDateString() ? 'Today' : day)); lastDay = day; }
+    const mine = m.senderId === me.id;
+    const d = el('div', 'msg' + (mine ? ' mine' : '') + (m.deleted ? ' deleted' : ''));
+    d.dataset.id = m.id; d.tabIndex = 0;
+    if (c.type === 'group' && !mine) { const w = el('span', 'who', m.senderName); w.style.color = `hsl(${hue(m.senderName)} 50% 32%)`; d.append(w); }
+    if (m.deleted) d.append('Message deleted');
+    else {
+      if (m.pinned) d.append(el('span', 'pinned-tag', '📌 Pinned'));
+      if (m.poll) d.append(pollNode(m, c));
+      else {
+        if (m.file) d.append(fileNode(m));
+        if (m.body) d.append(m.body);
+      }
+      d.append(el('span', 't', fmtTime(m.createdAt) + (m.editedAt ? ' · edited' : '')));
+      const t = el('div', 'tools');
+      const pin = el('button', null, m.pinned ? 'Unpin' : 'Pin');
+      pin.onclick = () => send({ type: 'pin', cid: active, id: m.id, on: !m.pinned });
+      t.append(pin);
+      if (mine && m.kind === 'text') {
+        const ed = el('button', null, 'Edit');
+        ed.onclick = async () => {
+          const v = prompt('Edit message', m.body);
+          if (!v || !v.trim() || v === m.body) return;
+          send({ type: 'edit', cid: active, id: m.id, body: c.encrypted ? await E2E.encryptText(await convKey(c), v.trim()) : v });
+        };
+        t.append(ed);
+      }
+      if (mine) {
+        const del = el('button', null, 'Delete');
+        del.onclick = () => { if (confirm('Delete this for everyone?')) send({ type: 'delete', cid: active, id: m.id }); };
+        t.append(del);
+      }
+      d.append(t);
+    }
+    box.append(d);
+    if (m === myLast) {
+      const others = c.members.filter(x => x.id !== me.id && x.username !== 'Assistant');
+      if (others.length && others.every(x => x.lastRead >= m.id)) box.append(el('div', 'seen', c.type === 'dm' ? 'Seen' : 'Seen by everyone'));
+    }
+  }
+  if (forceBottom || nearBottom) box.scrollTop = box.scrollHeight;
+}
+
+// Load older messages when scrolling to the top
+$('#msgs').onscroll = async e => {
+  const box = e.target, list = msgs.get(active);
+  if (box.scrollTop > 0 || !list || !list.length || list._done || list._busy) return;
+  list._busy = true;
+  const older = await api('GET', `/conversations/${active}/messages?before=${list[0].id}`).catch(() => []);
+  list._busy = false;
+  if (!older.length) { list._done = true; return; }
+  await decryptAll(older);
+  const h = box.scrollHeight;
+  list.unshift(...older); renderMsgs(false);
+  box.scrollTop = box.scrollHeight - h;
+};
+
+function markRead() {
+  const c = convs.get(active), list = msgs.get(active);
+  if (!c || !list || !list.length || document.hidden) return;
+  const lastId = list[list.length - 1].id;
+  const self = c.members.find(m => m.id === me.id);
+  if (c.unread || (self && self.lastRead < lastId)) {
+    c.unread = 0; if (self) self.lastRead = lastId;
+    send({ type: 'read', cid: active, messageId: lastId });
+    renderList();
+  }
+}
+document.addEventListener('visibilitychange', markRead);
+
+/* ------------------------------ Pinned messages ------------------------------ */
+function renderPins() {
+  const bar = $('#pinbar'), list = pins.get(active) || [];
+  if (!list.length) { bar.classList.add('hidden'); return; }
+  pinIdx = pinIdx % list.length;
+  const m = list[pinIdx];
+  bar.classList.remove('hidden'); bar.replaceChildren();
+  bar.append(el('span', 'pin-n', '📌 ' + (pinIdx + 1) + '/' + list.length),
+    el('span', 'pin-t', m.poll ? 'Poll: ' + m.body : m.file ? 'File: ' + m.file.name : m.body));
+  bar.title = 'Tap to jump to the pinned message, tap again for the next one';
+}
+$('#pinbar').onclick = () => {
+  const list = pins.get(active) || []; if (!list.length) return;
+  const target = $(`.msg[data-id="${list[pinIdx % list.length].id}"]`);
+  if (target) { target.scrollIntoView({ block: 'center', behavior: 'smooth' }); target.classList.add('flash'); setTimeout(() => target.classList.remove('flash'), 1300); }
+  pinIdx = (pinIdx + 1) % list.length; renderPins();
+};
+function syncPins(m) {
+  if (!pins.has(m.cid)) return;
+  let list = pins.get(m.cid).filter(x => x.id !== m.id);
+  if (m.pinned && !m.deleted) list.push(m);
+  list.sort((a, b) => b.id - a.id);
+  pins.set(m.cid, list);
+  if (active === m.cid) renderPins();
+}
+
+/* ------------------------------ Typing ------------------------------ */
+function renderTyping() {
+  const m = typingNow.get(active);
+  const names = m ? [...m.values()].map(v => v.name) : [];
+  $('#typing').textContent = names.length ? names.join(', ') + (names.length > 1 ? ' are typing…' : ' is typing…') : '';
+}
+let iTyping = false, typingOff;
+$('#text').oninput = e => {
+  const t = e.target; t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 120) + 'px';
+  const c = convs.get(active);
+  $('#rewrite').classList.toggle('hidden', !t.value.trim() || (c && c.encrypted));
+  if (!iTyping) { iTyping = true; send({ type: 'typing', cid: active, on: true }); }
+  clearTimeout(typingOff);
+  typingOff = setTimeout(() => { iTyping = false; send({ type: 'typing', cid: active, on: false }); }, 2000);
+};
+
+/* ------------------------------ Sending ------------------------------ */
+function send(o) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); }
+async function sendText() {
+  const t = $('#text'), body = t.value.trim(), c = convs.get(active);
+  if (!body || !c) return;
+  t.value = ''; t.style.height = 'auto'; $('#rewrite').classList.add('hidden'); clearChips();
+  try {
+    send({ type: 'send', cid: c.id, body: c.encrypted ? await E2E.encryptText(await convKey(c), body) : body });
+  } catch { alert('Could not encrypt this message. Sign out and back in to restore your keys.'); t.value = body; }
+  clearTimeout(typingOff); iTyping = false; send({ type: 'typing', cid: c.id, on: false });
+}
+$('#send').onclick = sendText;
+$('#text').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendText(); } };
+
+async function upload(blob, name, transcript) {
+  if (!active) return;
+  const q = `cid=${active}&name=${encodeURIComponent(name)}` + (transcript ? '&transcript=' + encodeURIComponent(transcript.slice(0, 1800)) : '');
+  const r = await fetch('/api/upload?' + q, {
+    method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/octet-stream' }, body: blob
+  });
+  if (!r.ok) alert((await r.json().catch(() => ({}))).error || 'Upload failed.');
+}
+$('#attach').onclick = () => $('#file').click();
+$('#file').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (f) await upload(f, f.name); };
+
+/* Voice notes + live transcription (browser speech recognition where available) */
+let recorder = null, chunks = [], recog = null, transcriptText = '', recogEnded = Promise.resolve();
+$('#rec').onclick = async () => {
+  const btn = $('#rec');
+  if (recorder) { recorder.stop(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    recorder = new MediaRecorder(stream); chunks = []; transcriptText = '';
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SR) {
+      recog = new SR(); recog.continuous = true; recog.interimResults = false; recog.lang = navigator.language || 'en-US';
+      recog.onresult = ev => { for (let i = ev.resultIndex; i < ev.results.length; i++) if (ev.results[i].isFinal) transcriptText += ev.results[i][0].transcript + ' '; };
+      recog.onerror = () => {};
+      recogEnded = new Promise(res => { recog.onend = res; });
+      try { recog.start(); } catch { /* already started */ }
+    }
+    recorder.ondataavailable = e => chunks.push(e.data);
+    recorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const type = recorder.mimeType || 'audio/webm';
+      recorder = null; btn.title = 'Record voice note'; btn.classList.remove('rec');
+      if (recog) { try { recog.stop(); } catch { /* ignore */ } await Promise.race([recogEnded, sleep(1500)]); recog = null; }
+      const ext = type.includes('ogg') ? 'ogg' : type.includes('mp4') ? 'm4a' : 'webm';
+      await upload(new Blob(chunks, { type }), `voice-note.${ext}`, transcriptText.trim());
+    };
+    recorder.start(); btn.title = 'Stop recording'; btn.classList.add('rec');
+  } catch { alert('Microphone access was blocked.'); }
+};
+
+/* ------------------------------ WebSocket ------------------------------ */
+let chain = Promise.resolve();   // handle events strictly in order (decryption is async)
+const enqueue = fn => { chain = chain.then(fn).catch(e => console.error(e)); };
+
+function connect() {
+  ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
+  const conn = $('#conn');
+  ws.onopen = () => enqueue(async () => {
+    conn.textContent = 'connected'; conn.classList.add('on');
+    await loadConversations();     // re-sync anything missed while offline
+    if (active && convs.has(active)) { msgs.delete(active); pins.delete(active); await openConv(active); }
+  });
+  ws.onclose = () => {
+    conn.textContent = 'reconnecting…'; conn.classList.remove('on');
+    if (wantSocket) setTimeout(connect, 1500);
+  };
+  ws.onmessage = ev => enqueue(() => handle(JSON.parse(ev.data)));
+}
+
+async function handle(d) {
+  switch (d.type) {
+    case 'hello': online.clear(); d.online.forEach(id => online.add(id)); renderList(); updateSub(); break;
+    case 'presence': d.online ? online.add(d.userId) : online.delete(d.userId); renderList(); updateSub(); break;
+    case 'conversation': convs.set(d.conversation.id, d.conversation); renderList(); break;
+    case 'message': await decryptMsg(d.message); onMessage(d.message); break;
+    case 'update': {
+      const m = await decryptMsg(d.message);
+      const list = msgs.get(m.cid);
+      if (list) { const i = list.findIndex(x => x.id === m.id); if (i > -1) list[i] = m; }
+      const c = convs.get(m.cid); if (c && c.last && c.last.id === m.id) c.last = m;
+      syncPins(m);
+      if (active === m.cid) renderMsgs(false);
+      renderList(); break;
+    }
+    case 'read': {
+      const c = convs.get(d.cid), m = c && c.members.find(x => x.id === d.userId);
+      if (m) m.lastRead = Math.max(m.lastRead, d.messageId);
+      if (active === d.cid) renderMsgs(false);
+      break;
+    }
+    case 'typing': {
+      if (d.userId === me.id) break;
+      let m = typingNow.get(d.cid); if (!m) typingNow.set(d.cid, m = new Map());
+      const prev = m.get(d.userId); if (prev) clearTimeout(prev.timer);
+      if (d.on) m.set(d.userId, { name: d.username, timer: setTimeout(() => { m.delete(d.userId); renderTyping(); }, 4000) });
+      else m.delete(d.userId);
+      if (active === d.cid) renderTyping();
+      break;
+    }
+  }
+}
+
+function onMessage(m) {
+  const c = convs.get(m.cid);
+  if (!c) { loadConversations(); return; }
+  c.last = m;
+  const list = msgs.get(m.cid);
+  if (list && !list.some(x => x.id === m.id)) list.push(m);
+  const mine = m.senderId === me.id;
+  const tm = typingNow.get(m.cid); if (tm) { tm.delete(m.senderId); if (active === m.cid) renderTyping(); }
+  if (mine) {
+    const self = c.members.find(x => x.id === me.id); if (self) self.lastRead = m.id;
+  } else if (!(active === m.cid && !document.hidden)) {
+    c.unread++;
+    if (document.hidden && 'Notification' in window && Notification.permission === 'granted')
+      new Notification(m.senderName + ' · ' + title(c), { body: c.encrypted ? 'New encrypted message' : snippet(m) });
+  }
+  if (active === m.cid) { renderMsgs(mine); markRead(); if (mine) clearChips(); else suggestReplies(); }
+  renderList();
+}
+
+/* ------------------------------ AI assist ------------------------------ */
+let suggestTicket = 0, suggestTimer;
+function clearChips() { suggestTicket++; $('#chips').replaceChildren(); }
+function suggestReplies() {
+  clearChips();
+  const c = convs.get(active), list = msgs.get(active), last = list && list[list.length - 1];
+  if (!me.aiEnabled || !c || c.encrypted || !last || last.senderId === me.id || last.deleted || last.file || last.poll || last.senderId === me.aiId) return;
+  const ticket = suggestTicket, cid = active;
+  clearTimeout(suggestTimer);
+  suggestTimer = setTimeout(async () => {
+    try {
+      const { replies } = await api('POST', '/ai/suggest', { cid });
+      if (ticket !== suggestTicket || cid !== active) return;
+      for (const r of replies) {
+        const b = el('button', 'chip smart', r); b.type = 'button';
+        b.onclick = () => { const t = $('#text'); t.value = r; t.dispatchEvent(new Event('input')); t.focus(); };
+        $('#chips').append(b);
+      }
+    } catch { /* suggestions are optional */ }
+  }, 600);
+}
+
+$('#rewrite').onclick = async e => {
+  const b = e.target.closest('button[data-style]'); if (!b) return;
+  const t = $('#text'), text = t.value.trim(); if (!text) return;
+  const all = $('#rewrite').querySelectorAll('button'); all.forEach(x => x.disabled = true);
+  try {
+    const r = await api('POST', '/ai/rewrite', { text, style: b.dataset.style });
+    t.value = r.text; t.dispatchEvent(new Event('input')); t.focus();
+  } catch (err) { alert(err.message); }
+  all.forEach(x => x.disabled = false);
+};
+
+$('#summarize').onclick = async () => {
+  const body = $('#sum-body'); body.textContent = 'Reading the conversation…';
+  $('#sum-dlg').showModal();
+  try { body.textContent = (await api('POST', '/ai/summary', { cid: active })).summary; }
+  catch (e) { body.textContent = e.message; }
+};
+$('#sum-close').onclick = () => $('#sum-dlg').close();
+
+/* ------------------------------ Polls & event polls ------------------------------ */
+function renderPollInputs() {
+  const ev = $('#p-event').checked, box = $('#p-opts');
+  const old = [...box.querySelectorAll('input')].map(i => i.value);
+  box.replaceChildren();
+  const n = Math.max(2, box.dataset.n ? Number(box.dataset.n) : 2);
+  for (let i = 0; i < n; i++) {
+    const inp = el('input'); inp.type = ev ? 'datetime-local' : 'text'; inp.maxLength = 80;
+    inp.placeholder = ev ? '' : 'Option ' + (i + 1);
+    if (!ev && old[i] && !/^\d{4}-/.test(old[i])) inp.value = old[i];
+    box.append(inp);
+  }
+}
+function resetPoll(n) { $('#p-opts').dataset.n = n; renderPollInputs(); }
+$('#poll-btn').onclick = () => { $('#p-q').value = ''; $('#p-event').checked = false; $('#p-err').textContent = ''; resetPoll(2); $('#poll-dlg').showModal(); };
+$('#p-event').onchange = () => { $('#p-opts').querySelectorAll('input').forEach(i => i.value = ''); renderPollInputs(); };
+$('#p-add').onclick = () => { const n = Number($('#p-opts').dataset.n || 2); if (n < 6) { const vals = [...$('#p-opts').querySelectorAll('input')].map(i => i.value); resetPoll(n + 1); $('#p-opts').querySelectorAll('input').forEach((i, k) => { if (vals[k]) i.value = vals[k]; }); } };
+$('#p-cancel').onclick = () => $('#poll-dlg').close();
+$('#p-create').onclick = async () => {
+  const ev = $('#p-event').checked;
+  const question = $('#p-q').value.trim();
+  const values = [...$('#p-opts').querySelectorAll('input')].map(i => i.value.trim()).filter(Boolean);
+  const options = values.map(v => {
+    if (!ev) return { text: v };
+    const date = new Date(v);
+    if (!Number.isFinite(date.getTime())) return { text: v, ts: null };
+    return { text: date.toLocaleString([], { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }), ts: date.toISOString() };
+  });
+  if (!question) { $('#p-err').textContent = 'Please enter a poll question.'; return; }
+  if (options.length < 2) { $('#p-err').textContent = 'Please enter at least two options.'; return; }
+  if (ev && options.some(o => !o.ts)) { $('#p-err').textContent = 'Please choose a valid date and time for every event option.'; return; }
+  try {
+    await api('POST', '/polls', { cid: active, question, event: ev, options });
+    $('#poll-dlg').close();
+  } catch (e) { $('#p-err').textContent = e.message || 'Could not create poll.'; }
+};
+
+/* ------------------------------ Groups ------------------------------ */
+const picked = new Map();   // id -> {username, pub}
+$('#new-group').onclick = () => {
+  picked.clear(); $('#g-name').value = ''; $('#g-find').value = ''; $('#g-err').textContent = ''; $('#g-enc').checked = false;
+  $('#g-results').replaceChildren(); renderPicked(); $('#group-dlg').showModal();
+};
+function renderPicked() {
+  const box = $('#g-picked'); box.replaceChildren();
+  for (const [id, u] of picked) {
+    const b = el('button', 'chip', u.username + ' ×'); b.type = 'button';
+    b.onclick = () => { picked.delete(id); renderPicked(); };
+    box.append(b);
+  }
+}
+let gTimer;
+$('#g-find').oninput = () => {
+  clearTimeout(gTimer);
+  gTimer = setTimeout(async () => {
+    const q = $('#g-find').value.trim(), box = $('#g-results'); box.replaceChildren();
+    if (!q) return;
+    try {
+      const users = await api('GET', '/users?q=' + encodeURIComponent(q));
+      for (const u of users) {
+        if (picked.has(u.id)) continue;
+        const b = el('button', 'chip', u.username); b.type = 'button';
+        b.onclick = () => { picked.set(u.id, u); renderPicked(); b.remove(); };
+        box.append(b);
+      }
+      if (!users.length) box.append(el('span', 'muted', 'No matching users. Check the username or create another account first.'));
+    } catch (e) {
+      box.append(el('span', 'err', e.message || 'Could not search users.'));
+    }
+  }, 200);
+};
+$('#g-create').onclick = async () => {
+  try {
+    const body = { name: $('#g-name').value, memberIds: [...picked.keys()] };
+    if ($('#g-enc').checked) {
+      const missing = [...picked.values()].filter(u => !u.pub).map(u => u.username);
+      if (missing.length) throw new Error(missing.join(', ') + ' can’t join an encrypted group (no encryption key).');
+      const k = await E2E.newConvKey();
+      body.encrypted = true; body.keys = { [me.id]: await E2E.wrapConvKey(k, priv, me.publicKey, me.id) };
+      for (const [id, u] of picked) body.keys[id] = await E2E.wrapConvKey(k, priv, u.pub, me.id);
+    }
+    const c = await api('POST', '/conversations/group', body);
+    convs.set(c.id, c); $('#group-dlg').close(); renderList(); openConv(c.id);
+  } catch (e) { $('#g-err').textContent = e.message; }
+};
+
+/* ------------------------------ Boot ------------------------------ */
+(async () => {
+  try {
+    me = await api('GET', '/me');
+    priv = await loadKey(me.id);
+    if (!priv) { await api('POST', '/logout').catch(() => {}); me = null; showAuth('Sign in again to unlock your encrypted chats on this device.'); return; }
+    await startApp();
+  } catch { showAuth(); }
+})();
+
+</script>
+</body>
+</html>
