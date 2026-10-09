@@ -200,7 +200,7 @@ function renderList() {
 }
 
 async function loadConversations() {
-  const rows = await db.listConversations();
+  const rows = await db.listConversations(me?.id);
   convs.clear();
   for (const conversation of rows) {
     convs.set(conversation.id, conversation);
@@ -208,7 +208,7 @@ async function loadConversations() {
   }
   renderList();
   for (const conversation of rows) await subscribe(conversation);
-  await db.subscribeMemberships(async () => {
+  await db.subscribeMemberships(me?.id, async () => {
     try { await loadConversations(); }
     catch (error) { showError(error); }
   });
@@ -255,7 +255,7 @@ async function startDm(user, encrypted) {
     keys[user.id] = await E2E.wrapConvKey(key, priv, user.pub, me.id);
   }
   const id = await db.createDm(user.id, encrypted, keys);
-  const conversation = await db.getConversation(id);
+  const conversation = await db.getConversation(id, me.id);
   convs.set(conversation.id, conversation);
   $('#find').value = ''; $('#results').classList.add('hidden'); $('#list').classList.remove('hidden');
   await subscribe(conversation); renderList(); await openConversation(conversation.id);
@@ -330,7 +330,7 @@ function renderPins() {
 async function openConversation(id) {
   active = id;
   let conversation = convs.get(id);
-  if (!conversation) { conversation = await db.getConversation(id); convs.set(id, conversation); }
+  if (!conversation) { conversation = await db.getConversation(id, me.id); convs.set(id, conversation); }
   $('#app').classList.add('in-chat'); $('#empty').classList.add('hidden'); $('#pane').classList.remove('hidden');
   $('#c-title').textContent = (conversation.encrypted ? '🔒 ' : '') + title(conversation);
   $('#c-sub').textContent = conversation.encrypted ? 'End-to-end encrypted' : conversation.members.map(m => m.username).join(', ');
@@ -377,6 +377,7 @@ function renderTyping() {
 
 async function subscribe(conversation) {
   await db.subscribeConversation(conversation, {
+    userId: me.id,
     username: me.username,
     message: async (incoming, eventType) => {
       await decryptMessage(incoming);
@@ -430,7 +431,7 @@ async function sendText() {
   if (!value || !conversation) return;
   try {
     const body = conversation.encrypted ? await E2E.encryptText(await convKey(conversation), value) : value;
-    await db.postMessage(conversation.id, body);
+    await db.postMessage(conversation.id, body, me.id);
     text.value = ''; text.style.height = 'auto';
     clearTimeout(typingOff); db.broadcast(active, 'typing', { userId: me.id, username: me.username, on: false });
   } catch (error) { showError(error); }
@@ -479,7 +480,7 @@ $('#g-create').onclick = async () => {
       for (const [id, user] of selected) keys[id] = await E2E.wrapConvKey(key, priv, user.pub, me.id);
     }
     const id = await db.createGroup($('#g-name').value, [...selected.keys()], encrypted, keys);
-    const conversation = await db.getConversation(id);
+    const conversation = await db.getConversation(id, me.id);
     convs.set(id, conversation); $('#group-dlg').close(); await subscribe(conversation); renderList(); await openConversation(id);
   } catch (error) { $('#g-err').textContent = error.message; }
 };

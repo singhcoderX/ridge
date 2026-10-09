@@ -86,25 +86,25 @@ export async function saveIdentity(publicKey, keyBackup) {
   fail(error);
 }
 
-async function hydrateConversations(conversationRows, memberRows) {
+async function hydrateConversations(conversationRows, memberRows, currentUserId) {
   if (!conversationRows.length) return [];
+  if (!currentUserId) throw new Error('Your sign-in session is missing. Please sign in again.');
   const memberIds = [...new Set(memberRows.map(row => row.user_id))];
   const profiles = await one(supabase.from('profiles').select('id,username,public_key').in('id', memberIds));
   const profileMap = new Map(profiles.map(row => [row.id, row]));
-  const self = (await supabase.auth.getUser()).data.user;
   return Promise.all(conversationRows.map(async row => {
     const members = memberRows.filter(member => member.conversation_id === row.id).map(member => {
       const p = profileMap.get(member.user_id) || {};
       return { id: member.user_id, username: p.username || 'Someone', pub: p.public_key || null,
         lastRead: Number(member.last_read_message_id || 0), wrappedKey: member.wrapped_key || null };
     });
-    const selfMember = members.find(member => member.id === self.user.id);
+    const selfMember = members.find(member => member.id === currentUserId);
     const lastRows = await one(supabase.from('messages').select('*').eq('conversation_id', row.id).order('id', { ascending: false }).limit(1));
     const last = lastRows[0] ? message(lastRows[0], new Map(profiles.map(p => [p.id, p.username]))) : null;
     let unread = 0;
     if (selfMember) {
       const { count, error } = await supabase.from('messages').select('id', { count: 'exact', head: true })
-        .eq('conversation_id', row.id).neq('sender_id', self.user.id).gt('id', selfMember.lastRead).eq('deleted', false);
+        .eq('conversation_id', row.id).neq('sender_id', currentUserId).gt('id', selfMember.lastRead).eq('deleted', false);
       fail(error); unread = count || 0;
     }
     return { id: row.id, type: row.type, name: row.name, encrypted: row.encrypted,
@@ -112,16 +112,16 @@ async function hydrateConversations(conversationRows, memberRows) {
   }));
 }
 
-export async function listConversations() {
-  const user = (await supabase.auth.getUser()).data.user;
+export async function listConversations(currentUserId) {
+  if (!currentUserId) throw new Error('Your sign-in session is missing. Please sign in again.');
   const memberRows = await one(supabase.from('conversation_members')
-    .select('conversation_id,user_id,last_read_message_id,wrapped_key').eq('user_id', user.id));
+    .select('conversation_id,user_id,last_read_message_id,wrapped_key').eq('user_id', currentUserId));
   if (!memberRows.length) return [];
   const ids = memberRows.map(row => row.conversation_id);
   const rows = await one(supabase.from('conversations').select('*').in('id', ids));
   const allMembers = await one(supabase.from('conversation_members')
     .select('conversation_id,user_id,last_read_message_id,wrapped_key').in('conversation_id', ids));
-  const hydrated = await hydrateConversations(rows, allMembers);
+  const hydrated = await hydrateConversations(rows, allMembers, currentUserId);
   return hydrated.sort((a, b) => new Date(b.last?.createdAt || b.createdAt) - new Date(a.last?.createdAt || a.createdAt));
 }
 
@@ -152,11 +152,11 @@ export async function createGroup(name, memberIds, encrypted, keys = {}) {
   }));
 }
 
-export async function getConversation(id) {
+export async function getConversation(id, currentUserId) {
   const memberRows = await one(supabase.from('conversation_members')
     .select('conversation_id,user_id,last_read_message_id,wrapped_key').eq('conversation_id', id));
   const rows = await one(supabase.from('conversations').select('*').eq('id', id).single());
-  return (await hydrateConversations([rows], memberRows))[0];
+  return (await hydrateConversations([rows], memberRows, currentUserId))[0];
 }
 
 export async function loadMessages(id, { before, limit = 50, pinned = false } = {}) {
@@ -172,10 +172,10 @@ export async function loadMessages(id, { before, limit = 50, pinned = false } = 
   return rows.map(row => message(row, names));
 }
 
-export async function postMessage(conversationId, body) {
-  const user = (await supabase.auth.getUser()).data.user;
-  const row = await one(supabase.from('messages').insert({ conversation_id: conversationId, sender_id: user.id, body }).select('*').single());
-  const names = await namesFor([user.id]);
+export async function postMessage(conversationId, body, senderId) {
+  if (!senderId) throw new Error('Your sign-in session is missing. Please sign in again.');
+  const row = await one(supabase.from('messages').insert({ conversation_id: conversationId, sender_id: senderId, body }).select('*').single());
+  const names = await namesFor([senderId]);
   return message(row, names);
 }
 
@@ -189,9 +189,10 @@ export async function mutateMessage(type, { cid, id, body, on }) {
 
 export async function subscribeConversation(conversation, handlers) {
   const id = conversation.id;
+  if (!handlers.userId) throw new Error('Your sign-in session is missing. Please sign in again.');
   if (roomChannels.has(id)) return;
   await supabase.realtime.setAuth();
-  const channel = supabase.channel(`conv:${id}`, { config: { private: true, presence: { key: (await supabase.auth.getUser()).data.user.id } } });
+  const channel = supabase.channel(`conv:${id}`, { config: { private: true, presence: { key: handlers.userId } } });
   channel.on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `conversation_id=eq.${id}` }, async payload => {
     const row = payload.new?.id ? payload.new : payload.old;
     if (!row?.id) return;
@@ -204,7 +205,7 @@ export async function subscribeConversation(conversation, handlers) {
   roomChannels.set(id, channel);
   try {
     await waitForChannel(channel);
-    await channel.track({ user_id: (await supabase.auth.getUser()).data.user.id, username: handlers.username });
+    await channel.track({ user_id: handlers.userId, username: handlers.username });
   } catch (error) {
     roomChannels.delete(id);
     await supabase.removeChannel(channel).catch(() => {});
@@ -212,13 +213,13 @@ export async function subscribeConversation(conversation, handlers) {
   }
 }
 
-export async function subscribeMemberships(onConversation) {
+export async function subscribeMemberships(userId, onConversation) {
   if (membershipChannel) return;
-  const user = (await supabase.auth.getUser()).data.user;
+  if (!userId) throw new Error('Your sign-in session is missing. Please sign in again.');
   await supabase.realtime.setAuth();
-  const channel = supabase.channel(`user:${user.id}`, { config: { private: true } });
+  const channel = supabase.channel(`user:${userId}`, { config: { private: true } });
   channel.on('postgres_changes', {
-    event: 'INSERT', schema: 'public', table: 'conversation_members', filter: `user_id=eq.${user.id}`
+    event: 'INSERT', schema: 'public', table: 'conversation_members', filter: `user_id=eq.${userId}`
   }, payload => onConversation(payload.new.conversation_id));
   membershipChannel = channel;
   try {
