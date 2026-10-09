@@ -67,7 +67,11 @@ export async function getMyProfile() {
 }
 
 export async function saveIdentity(publicKey, keyBackup) {
-  const user = await one(supabase.from('profiles').update({ public_key: publicKey }).select('id').single());
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  fail(authError);
+  if (!authData.user) throw new Error('Please sign in.');
+  const user = await one(supabase.from('profiles').update({ public_key: publicKey })
+    .eq('id', authData.user.id).select('id').single());
   const { error } = await supabase.from('key_backups').upsert({ user_id: user.id, encrypted_private_key: keyBackup });
   fail(error);
 }
